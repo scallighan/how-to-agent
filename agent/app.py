@@ -68,14 +68,14 @@ async def on_message(context: TurnContext, _):
     text = context.activity.text
     print(f"Received message: {text}")
     try:
-        await context.streaming_response.queue_informative_update("Getting ready...\n")
+        context.streaming_response.queue_informative_update("Getting ready...\n")
         
         async for update in AGENT.run(text, stream=True):
             #await context.send_activity(f"{text} (echo from agent)")
             output_text = update.text
             if len(output_text) > 0:
                 print(f"Agent response: {output_text}")
-                await context.streaming_response.queue_text_chunk(output_text)
+                context.streaming_response.queue_text_chunk(output_text)
         
     except Exception as e:
         print(f"Error processing message: {e}")
