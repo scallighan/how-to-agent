@@ -61,6 +61,7 @@ AGENT = Agent(
             instructions="You are a friendly assistant."
         )
     
+
 @AGENT_APP.activity("message")
 async def on_message(context: TurnContext, _):
     global CONVERSATION_ID
@@ -68,14 +69,18 @@ async def on_message(context: TurnContext, _):
     text = context.activity.text
     print(f"Received message: {text}")
     try:
-        context.streaming_response.queue_informative_update("Getting ready...\n")
+        context.streaming_response.queue_informative_update("Getting ready...")
         
-        async for update in AGENT.run(text, stream=True):
-            #await context.send_activity(f"{text} (echo from agent)")
+        stream = AGENT.run(text, stream=True)
+        async for update in stream:
             output_text = update.text
             if len(output_text) > 0:
-                print(f"Agent response: {output_text}")
+                #print(f"Agent response: {output_text}")
                 context.streaming_response.queue_text_chunk(output_text)
+
+        final = await stream.get_final_response()
+        print(f"Streaming complete! Full text: {final.text}")
+        print(f"Token usage: {final.usage_details}")
         
     except Exception as e:
         print(f"Error processing message: {e}")
