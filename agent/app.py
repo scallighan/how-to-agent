@@ -92,7 +92,8 @@ async def on_message(context: TurnContext, _):
     except Exception as e:
         print(f"Error processing message: {e}")
         context.streaming_response.queue_text_chunk(f"Sorry, something went wrong while processing your message. {e}")
-    
+    finally:
+        await context.streaming_response.end_stream()
 
 
     
