@@ -1,3 +1,5 @@
+import asyncio
+
 from microsoft_agents.activity import load_configuration_from_env
 from microsoft_agents.authentication.msal import MsalConnectionManager
 from microsoft_agents.hosting.core import (
@@ -69,14 +71,19 @@ async def on_message(context: TurnContext, _):
     text = context.activity.text
     print(f"Received message: {text}")
     try:
+        context.streaming_response.set_feedback_loop(True)
+        context.streaming_response.set_generated_by_ai_label(True)
         context.streaming_response.queue_informative_update("Getting ready...")
         
         stream = AGENT.run(text, stream=True)
+        streamed_output = ""
         async for update in stream:
             output_text = update.text
             if len(output_text) > 0:
-                #print(f"Agent response: {output_text}")
+                print(f"Agent response: {output_text}")
                 context.streaming_response.queue_text_chunk(output_text)
+            streamed_output += output_text
+            
 
         final = await stream.get_final_response()
         print(f"Streaming complete! Full text: {final.text}")
@@ -84,7 +91,9 @@ async def on_message(context: TurnContext, _):
         
     except Exception as e:
         print(f"Error processing message: {e}")
-        await context.send_activity(f"Sorry, something went wrong while processing your message. {e}")
+        context.streaming_response.queue_text_chunk(f"Sorry, something went wrong while processing your message. {e}")
+    finally:
+        context.streaming_response.complete()
 
 
     

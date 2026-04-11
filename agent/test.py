@@ -21,7 +21,7 @@ async def do_the_thing():
         output_text = update.text
         if len(output_text) > 0:
             print(f"Agent response: {output_text}")
-            
+        
 
     final = await stream.get_final_response()
     print(f"Streaming complete! Full text: {final.text}")
