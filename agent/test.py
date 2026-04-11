@@ -18,6 +18,8 @@ agent = Agent(
 async def do_the_thing():
     
     async for update in agent.run("Write a haiku about shipping 1.0.", stream=True):
-        print(update)
+        output_text = update.text
+        if len(output_text) > 0:
+            print(f"Agent response: {output_text}")
 
 asyncio.run(do_the_thing())
