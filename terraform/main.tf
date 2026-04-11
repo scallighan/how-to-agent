@@ -102,15 +102,15 @@ data "local_file" "json_files" {
 }
 
 # upload the JSON files to the storage account
-resource "azurerm_storage_blob" "json_files" {
-  depends_on = [ azurerm_role_assignment.current_user_storage ]
-  for_each = data.local_file.json_files
-  name     = each.key
-  storage_account_name = azurerm_storage_account.this.name
-  storage_container_name = azurerm_storage_container.search.name
-  type     = "Block"
-  source   = each.value.filename
-}
+# resource "azurerm_storage_blob" "json_files" {
+#   depends_on = [ azurerm_role_assignment.current_user_storage ]
+#   for_each = data.local_file.json_files
+#   name     = each.key
+#   storage_account_name = azurerm_storage_account.this.name
+#   storage_container_name = azurerm_storage_container.search.name
+#   type     = "Block"
+#   source   = each.value.filename
+# }
 
 
 resource "azurerm_search_service" "this" {
@@ -340,14 +340,14 @@ resource "azurerm_container_app" "bot" {
 }
 
 resource "azurerm_user_assigned_identity" "bot" {
-  location            = data.azurerm_resource_group.this.location
+  location            = azurerm_resource_group.this.location
   name                = "uai-bot-${local.func_name}"
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.this.name
 }
 
 resource "azurerm_bot_service_azure_bot" "teamsbot" {
   name                = "bot-${local.func_name}"
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.this.name
   location            = "global"
   microsoft_app_id    = azurerm_user_assigned_identity.bot.client_id
   sku                 = "F0"
@@ -361,12 +361,12 @@ resource "azurerm_bot_service_azure_bot" "teamsbot" {
 resource "azurerm_bot_channel_ms_teams" "teams" {
   bot_name            = azurerm_bot_service_azure_bot.teamsbot.name
   location            = azurerm_bot_service_azure_bot.teamsbot.location
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.this.name
 }
 
 # give the bot identity access to foundry with Azure AI User role
 resource "azurerm_role_assignment" "bot_foundry_access" {
-  scope                = data.azurerm_resource_group.this.id
+  scope                = azurerm_resource_group.this.id
   role_definition_name = "Azure AI User"
   principal_id         = azurerm_user_assigned_identity.bot.principal_id
 }

@@ -5,16 +5,16 @@
   "version": "1.0.0",
   "developer": {
     "name": "scallighan",
-    "websiteUrl": "https://github.com/scallighan/level-up-azure-app-stack",
-    "privacyUrl": "https://github.com/scallighan/level-up-azure-app-stack",
-    "termsOfUseUrl": "https://github.com/scallighan/level-up-azure-app-stack"
+    "websiteUrl": "https://github.com/scallighan/how-to-agent",
+    "privacyUrl": "https://github.com/scallighan/how-to-agent",
+    "termsOfUseUrl": "https://github.com/scallighan/how-to-agent"
   },
   "icons": {
     "color": "color.png",
     "outline": "outline.png"
   },
   "name": {
-    "short": "levelup-bot",
+    "short": "how-to-agent",
     "full": "Copilot Agent Framework Demo"
   },
   "description": {
