@@ -380,3 +380,9 @@ resource "azurerm_role_assignment" "bot_foundry_access" {
   role_definition_name = "Azure AI User"
   principal_id         = azurerm_user_assigned_identity.bot.principal_id
 }
+
+resource "azurerm_role_assignment" "bot_search_access" {
+  scope                = azurerm_resource_group.this.id
+  role_definition_name = "Search Index Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.bot.principal_id
+}

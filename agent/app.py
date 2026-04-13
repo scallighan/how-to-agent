@@ -91,12 +91,13 @@ async def on_message(context: TurnContext, _):
 
     text = context.activity.text
     print(f"Received message: {text}")
+    print(f"Activity: {context.activity}")
     try:
         context.streaming_response.set_feedback_loop(True)
         context.streaming_response.set_generated_by_ai_label(True)
         context.streaming_response.queue_informative_update("Getting ready...")
-        
-        stream = AGENT.run(text, stream=True)
+        print("Running agent...")
+        stream = AGENT.run(text, function_invocation_kwargs={}, stream=True)
         streamed_output = ""
         async for update in stream:
             output_text = update.text
