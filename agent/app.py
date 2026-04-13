@@ -17,7 +17,7 @@ from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from openai.types.responses.response_input_param import McpApprovalResponse, ResponseInputParam
 
-from agent_framework import Agent
+from agent_framework import Agent, MCPStreamableHTTPTool
 from agent_framework.azure import AzureAISearchContextProvider
 from agent_framework.foundry import FoundryChatClient
 
@@ -68,13 +68,19 @@ AGENT = Agent(
             model=os.environ.get("FOUNDRY_MODEL", "gpt-5.4-mini"),
             credential=DefaultAzureCredential(),
             ),
-            name="HelloAgent",
+            name="How-To-Agent",
             instructions=(
                 "You are a helpful assistant with advanced reasoning capabilities. "
                 "Use the provided context from the knowledge base to answer complex "
                 "questions that may require synthesizing information from multiple sources."
             ),
             context_providers=[search_provider],
+            tools=[MCPStreamableHTTPTool(
+                name="mslearn tool",
+                description="A tool to call Microsoft Learn APIs and stream the response back to the user. Use this tool to get information about Microsoft products, services, documentation, and learning resources. The tool accepts a question as input, queries the Microsoft Learn API, and returns a concise answer based on the retrieved information.",
+                url="https://learn.microsoft.com/api/mcp",
+                header_provider=lambda kwargs: {},
+            )],
 
         )
     
