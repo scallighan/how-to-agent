@@ -11,3 +11,10 @@ variable "location" {
 variable "gh_repo" {
   type = string
 }
+
+
+variable "search_knowledge_base_name" {
+  type    = string
+  default = "knowledgebase-1775762012147"
+  
+}

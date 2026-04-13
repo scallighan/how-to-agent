@@ -18,6 +18,7 @@ from azure.identity import DefaultAzureCredential
 from openai.types.responses.response_input_param import McpApprovalResponse, ResponseInputParam
 
 from agent_framework import Agent
+from agent_framework.azure import AzureAISearchContextProvider
 from agent_framework.foundry import FoundryChatClient
 
 
@@ -53,6 +54,14 @@ async def _reset(context: TurnContext, _: TurnState):
 AGENT_APP.message("help")(_help)
 AGENT_APP.message("reset")(_reset)
 
+search_provider = AzureAISearchContextProvider(
+            source_id="search_provider",
+            endpoint=os.environ.get("AZURE_SEARCH_ENDPOINT"),
+            credential=DefaultAzureCredential(),
+            mode="agentic",
+            knowledge_base_name=os.environ.get("SEARCH_KNOWLEDGE_BASE_NAME"),
+        )
+
 AGENT = Agent(
             client= FoundryChatClient(
             project_endpoint=os.environ.get("AZURE_AI_PROJECT_ENDPOINT"),
@@ -60,7 +69,13 @@ AGENT = Agent(
             credential=DefaultAzureCredential(),
             ),
             name="HelloAgent",
-            instructions="You are a friendly assistant."
+            instructions=(
+                "You are a helpful assistant with advanced reasoning capabilities. "
+                "Use the provided context from the knowledge base to answer complex "
+                "questions that may require synthesizing information from multiple sources."
+            ),
+            context_providers=[search_provider],
+
         )
     
 

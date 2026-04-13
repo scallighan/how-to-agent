@@ -96,10 +96,10 @@ resource "azurerm_storage_container" "search" {
 }
 
 # loop through the data directory and upload any *.json files to the storage account
-data "local_file" "json_files" {
-  for_each = fileset("${path.module}/data", "*.json")
-  filename = "${path.module}/data/${each.value}"
-}
+# data "local_file" "json_files" {
+#   for_each = fileset("${path.module}/data", "*.json")
+#   filename = "${path.module}/data/${each.value}"
+# }
 
 # upload the JSON files to the storage account
 # resource "azurerm_storage_blob" "json_files" {
@@ -306,6 +306,16 @@ resource "azurerm_container_app" "bot" {
       env {
         name = "FOUNDRY_MODEL"
         value = "gpt-5.4-mini"
+      }
+
+      env {
+        name = "AZURE_SEARCH_ENDPOINT"
+        value = azurerm_search_service.this.endpoint
+      }
+
+      env {
+        name = "SEARCH_KNOWLEDGE_BASE_NAME"
+        value = var.search_knowledge_base_name
       }
 
     }
