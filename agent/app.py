@@ -17,7 +17,7 @@ from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from openai.types.responses.response_input_param import McpApprovalResponse, ResponseInputParam
 
-from agent_framework import Agent, MCPStreamableHTTPTool
+from agent_framework import Agent, MCPStreamableHTTPTool, AgentSession
 from agent_framework.azure import AzureAISearchContextProvider
 from agent_framework.foundry import FoundryChatClient
 
@@ -36,7 +36,8 @@ AGENT_APP = AgentApplication[TurnState](
     authorization=AUTHORIZATION
 )
 
-CONVERSATION_ID=None
+SESSIONS = {}
+CONVERSATION_ID = None
 
 async def _help(context: TurnContext, _: TurnState):
     await context.send_activity(
@@ -93,11 +94,20 @@ async def on_message(context: TurnContext, _):
     print(f"Received message: {text}")
     print(f"Activity: {context.activity}")
     try:
+        conversation_id = context.activity.conversation.id
+        print(f"Conversation ID: {conversation_id}")
+        if conversation_id not in SESSIONS:
+            print("Creating new session for conversation.")
+            session = AGENT.create_session(session_id=conversation_id)
+            SESSIONS[conversation_id] = session.to_dict()
+        reseumed_session = AgentSession.from_dict(SESSIONS[conversation_id])
+        
+
         context.streaming_response.set_feedback_loop(True)
         context.streaming_response.set_generated_by_ai_label(True)
         context.streaming_response.queue_informative_update("Getting ready...")
         print("Running agent...")
-        stream = AGENT.run(text, function_invocation_kwargs={}, stream=True)
+        stream = AGENT.run(text, session=reseumed_session, function_invocation_kwargs={}, stream=True)
         streamed_output = ""
         async for update in stream:
             output_text = update.text
@@ -116,6 +126,7 @@ async def on_message(context: TurnContext, _):
         context.streaming_response.queue_text_chunk(f"Sorry, something went wrong while processing your message. {e}")
     finally:
         await context.streaming_response.end_stream()
+        SESSIONS[conversation_id] = reseumed_session.to_dict()
 
 
     
