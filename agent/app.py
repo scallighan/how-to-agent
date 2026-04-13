@@ -58,15 +58,15 @@ AGENT_APP.message("help")(_help)
 AGENT_APP.message("reset")(_reset)
 
 search_provider = AzureAISearchContextProvider(
-            source_id="search_provider",
-            endpoint=os.environ.get("AZURE_SEARCH_ENDPOINT"),
-            credential=DefaultAzureCredential(),
-            mode="agentic",
-            knowledge_base_name=os.environ.get("SEARCH_KNOWLEDGE_BASE_NAME"),
-        )
+    source_id="search_provider",
+    endpoint=os.environ.get("AZURE_SEARCH_ENDPOINT"),
+    credential=DefaultAzureCredential(),
+    mode="agentic",
+    knowledge_base_name=os.environ.get("SEARCH_KNOWLEDGE_BASE_NAME"),
+)
 
 skills_provider = SkillsProvider(
-    skill_paths=Path(__file__).parent / "skills"
+    skill_paths=f"{os.path.dirname(__file__)}/skills"
 )
 
 AGENT = Agent(
@@ -81,14 +81,13 @@ AGENT = Agent(
                 "Use the provided context from the knowledge base to answer complex "
                 "questions that may require synthesizing information from multiple sources."
             ),
-            context_providers=[search_provider],
+            context_providers=[search_provider, skills_provider],
             tools=[MCPStreamableHTTPTool(
                 name="mslearn tool",
                 description="A tool to call Microsoft Learn APIs and stream the response back to the user. Use this tool to get information about Microsoft products, services, documentation, and learning resources. The tool accepts a question as input, queries the Microsoft Learn API, and returns a concise answer based on the retrieved information.",
                 url="https://learn.microsoft.com/api/mcp",
                 header_provider=lambda kwargs: {},
             )],
-
         )
     
 
