@@ -1,5 +1,7 @@
 import asyncio
 
+from click import Path
+
 from microsoft_agents.activity import load_configuration_from_env
 from microsoft_agents.authentication.msal import MsalConnectionManager
 from microsoft_agents.hosting.core import (
@@ -17,7 +19,7 @@ from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from openai.types.responses.response_input_param import McpApprovalResponse, ResponseInputParam
 
-from agent_framework import Agent, MCPStreamableHTTPTool, AgentSession
+from agent_framework import Agent, MCPStreamableHTTPTool, AgentSession, SkillsProvider
 from agent_framework.azure import AzureAISearchContextProvider
 from agent_framework.foundry import FoundryChatClient
 
@@ -62,6 +64,10 @@ search_provider = AzureAISearchContextProvider(
             mode="agentic",
             knowledge_base_name=os.environ.get("SEARCH_KNOWLEDGE_BASE_NAME"),
         )
+
+skills_provider = SkillsProvider(
+    skill_paths=Path(__file__).parent / "skills"
+)
 
 AGENT = Agent(
             client= FoundryChatClient(
