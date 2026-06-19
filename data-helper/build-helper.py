@@ -1,11 +1,11 @@
 
-# 2025ignite.json sourced from https://api-v2.ignite.microsoft.com/api/session/all/en-US
+# 2026build.json sourced from https://api-v2.build.microsoft.com/api/session/all/en-US
 
-# I want to take the 2025ignite.json file and convert each session into a json file with the following format:
+# I want to take the 2026build.json file and convert each session into a json file with the following format:
 # {
 #    "id": "sessionCode",
 #    "title": "title",
-#    "link": "https://ignite.microsoft.com/en-US/sessions/{sessionCode}",
+#    "link": "https://build.microsoft.com/en-US/sessions/{sessionCode}",
 #    "speakers": "speakerNames",
 #    "description": "description",
 #    "transcription": "aiDescription"
@@ -22,7 +22,7 @@ def convert_sessions_to_json(input_file, output_folder):
     for session in sessions:
         session_code = session.get('sessionCode', '')
         title = session.get('title', '')
-        link = f"https://ignite.microsoft.com/en-US/sessions/{session_code}"
+        link = f"https://build.microsoft.com/en-US/sessions/{session_code}"
         speakers = session.get('speakerNames', '')
         description = session.get('description', '')
         ai_description = session.get('aiDescription', '')
@@ -43,7 +43,7 @@ def convert_sessions_to_json(input_file, output_folder):
             json.dump(session_data, out_f, indent=4)
 
 
-# upload the sessions_json to an Azure Storage Account container called "search" in the directory "2025-Ignite"
+# upload the sessions_json to an Azure Storage Account container called "search" in the directory "2026-Build"
 from azure.storage.blob import BlobServiceClient
 import os
 from azure.identity import DefaultAzureCredential
@@ -57,14 +57,14 @@ def upload_sessions_to_blob_storage(container_name, local_folder):
     for filename in os.listdir(local_folder):
         if filename.endswith('.json'):
             file_path = os.path.join(local_folder, filename)
-            blob_name = f"2025-Ignite/{filename}"
+            blob_name = f"2026-Build/{filename}"
             with open(file_path, 'rb') as data:
                 container_client.upload_blob(name=blob_name, data=data, overwrite=True)
                 print(f"Uploaded {filename} to blob storage as {blob_name}")
 
 if __name__ == "__main__":
-    input_file = 'data/2025ignite.json'  # Path to the input JSON file
-    output_folder = 'sessions_json/2025ignite'  # Folder to save the output JSON files
+    input_file = 'data/2026build.json'  # Path to the input JSON file
+    output_folder = 'sessions_json/2026build'  # Folder to save the output JSON files
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)

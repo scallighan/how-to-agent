@@ -1,6 +1,6 @@
 microsoft-agents-hosting-aiohttp
 cryptography
 microsoft-agents-authentication-msal
-dotenv
+python-dotenv
 agent-framework>=1.0.0,<2
 azure-identity
